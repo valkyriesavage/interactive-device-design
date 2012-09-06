@@ -1,6 +1,6 @@
 /*
   Blink
-  Turns on an LED on for one second, then off for one second, repeatedly.
+  Turns on an LED on for 100ms, then off for 100ms, FOREVER.
  
   This example code is adopted from the public domain.
  */
@@ -19,7 +19,7 @@ void setup() {
 // the loop routine runs over and over again forever:
 void loop() {
   digitalWrite(led, HIGH);   // turn the LED on (HIGH is the voltage level)
-  delay(timer_ms);               // wait for a some time
+  delay(timer_ms);               // wait for some time
   digitalWrite(led, LOW);    // turn the LED off by making the voltage LOW
-  delay(timer_ms);               // wait for a some time
+  delay(timer_ms);               // wait for some time
 }
