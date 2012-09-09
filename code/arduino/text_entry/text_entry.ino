@@ -20,24 +20,39 @@ void setup() {
 
 // a timer to keep track of timeouts
 int timer = 0;
-const int TIMEOUT = 100;
+const int TIMEOUT = 50;
 
 // the hit code that we can decode letters from
 int code = 0;
 
+// did we already output this letter to serial?
+boolean output = false;
+
 void loop() {
+  int hitsThisLoop = 0;
   for (int pin_idx = 0; pin_idx < NUM_KEYS; pin_idx++) {
     int pin = KEYS[pin_idx];
-    if (!(code & 1<<pin_idx) && hit(pin)) {
+    if (hit(pin)) {
       code |= 1 << pin_idx;
+      hitsThisLoop |= 1;
     }
   }
 
   // only count towards timeout if we are getting data
-  if (code > 0)  timer++;
+  if (code > 0)  {
+    timer++;
+  }
+  if (hitsThisLoop == 0) {
+    // we need to reset when the user lifts all his/her fingers
+    output = false;
+    timer = 0;
+  }
 
   if (timer > TIMEOUT) {
-    Serial.print(decode(code));
+    if(!output) {
+      Serial.print(decode(code));  
+      output = true;
+    }
     code = 0;
     timer = 0;
   }
@@ -45,11 +60,11 @@ void loop() {
 
 // taken from labs.teague.com/projects/ChordedKeyboard
 char LETTERS[] = {
-  '_',
+  '-',
   ' ',
-  '\n',
+  0x08,
   'n',
-  '^H', // 4
+  '\n', // 4
   'o',
   'c',
   'r',
