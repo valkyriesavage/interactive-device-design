@@ -20,7 +20,7 @@ void setup() {
 
 // a timer to keep track of timeouts
 int timer = 0;
-const int TIMEOUT = 50;
+const int TIMEOUT = 150;
 
 // the hit code that we can decode letters from
 int code = 0;
@@ -34,16 +34,17 @@ void loop() {
     int pin = KEYS[pin_idx];
     if (hit(pin)) {
       code |= 1 << pin_idx;
-      hitsThisLoop |= 1;
+      hitsThisLoop |= 1 << pin_idx;
     }
   }
 
-  // only count towards timeout if we are getting data
+  // only count towards timeout if we are getting the same data over and over
   if (code > 0)  {
     timer++;
   }
+  
+  // we need to reset when the user lifts all his/her fingers
   if (hitsThisLoop == 0) {
-    // we need to reset when the user lifts all his/her fingers
     output = false;
     timer = 0;
   }
