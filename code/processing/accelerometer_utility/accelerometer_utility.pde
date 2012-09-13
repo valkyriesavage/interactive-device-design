@@ -77,6 +77,7 @@ void draw () {
     horzPos = 1;
     cleanSlate();
   }
+  horzPos++;
   
   x.draw();
   y.draw();
@@ -85,13 +86,13 @@ void draw () {
 
 
 void controlEvent(ControlEvent theControlEvent) {
-  if(theControlEvent.isFrom("xThreshes")) {
+  if(theControlEvent.isFrom(x.label())) {
     x.newThreshes(int(theControlEvent.getController().getArrayValue(LOW)),
                   int(theControlEvent.getController().getArrayValue(HIGH)));
-  } else if(theControlEvent.isFrom("yThreshes")) {
+  } else if(theControlEvent.isFrom(y.label())) {
     y.newThreshes(int(theControlEvent.getController().getArrayValue(LOW)),
                   int(theControlEvent.getController().getArrayValue(HIGH)));
-  } else if(theControlEvent.isFrom("zThreshes")) {
+  } else if(theControlEvent.isFrom(z.label())) {
     z.newThreshes(int(theControlEvent.getController().getArrayValue(LOW)),
                   int(theControlEvent.getController().getArrayValue(HIGH)));
   } 
@@ -127,83 +128,77 @@ void serialEvent (Serial myPort) {
 
 class Axis {
   int screenBoundLower, screenBoundUpper;
-  char label;
+  String label;
   float lastReading;
   float currentReading;
   
   float[] threshes = {0,0};
-  boolean[] crossedThreshes = {false, false};
+  boolean on = false;
   
   Range threshRange;
  
   Axis(int screenBoundLower, int screenBoundUpper, char label) {
     this.screenBoundLower = screenBoundLower;
     this.screenBoundUpper = screenBoundUpper;
-    this.label = label;
+    this.label = label + "Threshes";
     
-    threshRange = cp5.addRange(label + "threshes")
-             // disable broadcasting since setRange and setRangeValues will trigger an event
-             .setBroadcast(false) 
-             .setPosition(graphWid, (screenBoundLower+screenBoundUpper)/2 - 20)
-             .setSize(deg360,40)
-             .setHandleSize(20)
-             .setRange(0,360)
-             .setRangeValues(50,100)
-             // after the initialization we turn broadcast back on again
-             .setBroadcast(true)
-             .setColorForeground(fg)
-             .setColorBackground(bg)  
-             ;
+    int defaultLow = 50;
+    int defaultHigh = 100;
+    
+    threshRange = cp5.addRange(this.label)
+                     .setPosition(graphWid, (screenBoundLower+screenBoundUpper)/2 - 20)
+                     .setSize(deg360,40)
+                     .setHandleSize(20)
+                     .setRange(deg0,deg360)
+                     .setRangeValues(defaultLow,defaultHigh)
+                     .setColorForeground(fg)
+                     .setColorBackground(bg)  
+                     ;
+    threshes[LOW] = defaultLow;
+    threshes[HIGH] = defaultHigh;
   }
   
   void draw() {
     stroke(base);
     line(0, screenBoundUpper, width, screenBoundUpper);
     stroke(firstThresh);
-    point(horzPos, threshes[LOW]);
+    point(horzPos, map(threshes[LOW], deg0, deg360, screenBoundLower+1, screenBoundUpper-1));
     stroke(secondThresh);
-    point(horzPos, threshes[HIGH]);
+    point(horzPos, map(threshes[HIGH], deg0, deg360, screenBoundLower+1, screenBoundUpper-1));
     
-    if (crossedThreshes[LOW] || crossedThreshes[HIGH]) stroke(firstThresh);
-    else if (crossedThreshes[LOW] && crossedThreshes[HIGH]) stroke(secondThresh);
+    if (crossedThresh(LOW)) stroke(firstThresh);
+    else if (on) stroke(secondThresh);
     else stroke(base);
-    point(horzPos, currentReading);
+    point(horzPos, map(currentReading, deg0, deg360, screenBoundLower, screenBoundUpper));
   }
   
-  void newReading(float newReading) {
-    newReading = map(newReading, deg0, deg360, screenBoundLower, screenBoundUpper);
-    
+  void newReading(float newReading) {    
     lastReading = currentReading;
     currentReading = newReading;
     
-    /*if (crossedFromBelow(LOW) && !crossedThreshes[LOW]) {
-      crossedThreshes[LOW] = true; 
-    } else if (crossedFromAbove(LOW) && crossedThreshes[LOW]){
-      crossedThreshes[LOW] = false;
-    } else 
-    
-    if (!crossedThreshes[HIGH] && crossedFromBelow(LOW)) {
-      crossedThreshes[LOW] = true;
+    if (crossedFromAbove(LOW)) {
+      on = false;
+    } else if (crossedFromBelow(HIGH)) {
+      on = true;
     }
-    else if (crossedThreshes[HIGH] && crossedFromAbove(LOW)) {
-      crossedThreshes[LOW] = true;
-    }
-    else if (crossedFromBelow(HIGH) && ) {
-      crossedThreshes[HIGH] = true;
-    }*/
-    // TODO : please implement this state machine!!!!! I am too tired to do it now.
   }
   
   boolean crossedFromBelow(int THRESH) {
-    return lastReading < threshes[THRESH] && currentReading > threshes[THRESH];
+    return lastReading < threshes[THRESH] && currentReading >= threshes[THRESH];
   }
   
   boolean crossedFromAbove(int THRESH) {
-    return lastReading > threshes[THRESH] && currentReading < threshes[THRESH];
+    return lastReading >= threshes[THRESH] && currentReading < threshes[THRESH];
+  }
+  
+  boolean crossedThresh(int THRESH) {
+    return currentReading >= threshes[THRESH];
   }
   
   void newThreshes(float lowThresh, float highThresh) {
-    threshes[LOW] = map(lowThresh, 0, 360, screenBoundLower, screenBoundUpper);
-    threshes[HIGH] = map(highThresh, 0, 360, screenBoundLower, screenBoundUpper);
+    threshes[LOW] = lowThresh;
+    threshes[HIGH] = highThresh;
   }
+  
+  String label() { return label; }
 }
