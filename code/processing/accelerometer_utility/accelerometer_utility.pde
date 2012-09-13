@@ -16,36 +16,32 @@ import processing.serial.*;
 import controlP5.*;
 
 Serial myPort;
-float xReading = 0;
-float yReading = 0;
-float zReading = 0;
 
 int deg0 = 0;
 int deg360 = 360;
 
 ControlP5 cp5;
-Range xRange;
-Range yRange;
-Range zRange;
 
-int[] xThreshes = {0,0};
-int[] yThreshes = {0,0};
-int[] zThreshes = {0,0};
-
-boolean xCrossedOne = false;
-boolean yCrossedOne = false;
-boolean zCrossedOne = false;
+int LOW = 0;
+int HIGH = 1;
 
 color firstThresh = color(255,0,0);
 color secondThresh = color(0,255,0);
 color base = color(0,0,255);
+color data = color(255);
+
+color fg = color(0,91,255,40);
+color bg = color(30,144,255,40);
 
 int horzPos = 1;
 
+int graphWid = 600;
 int graphHt = 600;
+
+Axis x, y, z;
  
 void setup () {
-  size(600, 800);        
+  size(graphWid + deg360, graphHt);        
  
   // List all the available serial ports
   println(Serial.list());
@@ -60,47 +56,10 @@ void setup () {
   
   // set up the nonsense for thresholding
   cp5 = new ControlP5(this);
-  color fg = color(0,91,255,40);
-  color bg = color(30,144,255,40);
-  xRange = cp5.addRange("xThreshes")
-             // disable broadcasting since setRange and setRangeValues will trigger an event
-             .setBroadcast(false) 
-             .setPosition(50, 600)
-             .setSize(420,40)
-             .setHandleSize(20)
-             .setRange(0,360)
-             .setRangeValues(50,100)
-             // after the initialization we turn broadcast back on again
-             .setBroadcast(true)
-             .setColorForeground(fg)
-             .setColorBackground(bg)  
-             ;
-  yRange = cp5.addRange("yThreshes")
-             // disable broadcasting since setRange and setRangeValues will trigger an event
-             .setBroadcast(false) 
-             .setPosition(50,650)
-             .setSize(420,40)
-             .setHandleSize(20)
-             .setRange(0,360)
-             .setRangeValues(50,100)
-             // after the initialization we turn broadcast back on again
-             .setBroadcast(true)
-             .setColorForeground(fg)
-             .setColorBackground(bg)  
-             ;
-  zRange = cp5.addRange("zThreshes")
-             // disable broadcasting since setRange and setRangeValues will trigger an event
-             .setBroadcast(false) 
-             .setPosition(50,700)
-             .setSize(420,40)
-             .setHandleSize(20)
-             .setRange(0,360)
-             .setRangeValues(50,100)
-             // after the initialization we turn broadcast back on again
-             .setBroadcast(true)
-             .setColorForeground(fg)
-             .setColorBackground(bg)  
-             ;
+
+  x = new Axis(0, graphHt/3, 'x');
+  y = new Axis(graphHt/3, 2*graphHt/3, 'y');
+  z = new Axis(2*graphHt/3, graphHt, 'z');
 
   // prepare for pretty data!
   cleanSlate();
@@ -108,58 +67,43 @@ void setup () {
 
 void cleanSlate() {
   background(0);
-  stroke(firstThresh);
-  line(0, xThreshes[0], width, xThreshes[0]);
-  line(0, yThreshes[0] + graphHt/3, width, yThreshes[0] + graphHt/3);
-  line(0, zThreshes[0] + 2*graphHt/3, width, zThreshes[0] + 2*graphHt/3);
-  stroke(secondThresh);
-  line(0, xThreshes[1], width, xThreshes[1]);
-  line(0, yThreshes[1] + graphHt/3, width, yThreshes[1] + graphHt/3);
-  line(0, zThreshes[1] + 2*graphHt/3, width, zThreshes[1] + 2*graphHt/3);
-  stroke(base);
-  line(0, graphHt/3, width, graphHt/3);
-  line(0, 2*graphHt/3, width, 2*graphHt/3);
-  line(0, graphHt, width, graphHt);
+  x.draw();
+  y.draw();
+  z.draw();
 }
 
 void draw () {
-  if (horzPos >= width) {
+  if (horzPos >= graphWid) {
     horzPos = 1;
     cleanSlate();
   }
   
-  stroke(255);
-  line(horzPos, graphHt/3, horzPos, xReading);
-  line(horzPos, 2*graphHt/3, horzPos, yReading);
-  line(horzPos, graphHt, horzPos, zReading);
-  
-  if(xReading > xThreshes[0]) {
-    stroke(secondThresh);
-    line(horzPos, graphHt/3, horzPos, xReading);
-  }
-  if(yReading > yThreshes[0]) {
-    stroke(secondThresh);
-    line(horzPos, 2*graphHt/3, horzPos, yReading);  
-  }
-  if(zReading > zThreshes[0]) {
-    stroke(secondThresh);
-    line(horzPos, graphHt, horzPos, zReading);  
-  }
+  x.draw();
+  y.draw();
+  z.draw();
 }
 
 
 void controlEvent(ControlEvent theControlEvent) {
   if(theControlEvent.isFrom("xThreshes")) {
-    xThreshes[0] = int(theControlEvent.getController().getArrayValue(0));
-    xThreshes[1] = int(theControlEvent.getController().getArrayValue(1));
+    x.newThreshes(int(theControlEvent.getController().getArrayValue(LOW)),
+                  int(theControlEvent.getController().getArrayValue(HIGH)));
   } else if(theControlEvent.isFrom("yThreshes")) {
-    yThreshes[0] = int(theControlEvent.getController().getArrayValue(0));
-    yThreshes[1] = int(theControlEvent.getController().getArrayValue(1));
+    y.newThreshes(int(theControlEvent.getController().getArrayValue(LOW)),
+                  int(theControlEvent.getController().getArrayValue(HIGH)));
   } else if(theControlEvent.isFrom("zThreshes")) {
-    zThreshes[0] = int(theControlEvent.getController().getArrayValue(0));
-    zThreshes[1] = int(theControlEvent.getController().getArrayValue(1));
+    z.newThreshes(int(theControlEvent.getController().getArrayValue(LOW)),
+                  int(theControlEvent.getController().getArrayValue(HIGH)));
   } 
 }
+
+// string format is x: vvv | y: vvv | z: vvv
+int xBeg = "x: ".length();
+int xEnd = "x: vvv".length(); 
+int yBeg = "x: vvv | y: ".length();
+int yEnd = "x: vvv | y: vvv".length();
+int zBeg = "x: vvv | y: vvv | z: ".length();
+int zEnd = "x: vvv | y: vvv | z: vvv".length();
 
 void serialEvent (Serial myPort) {
   // get the ASCII string:
@@ -167,27 +111,99 @@ void serialEvent (Serial myPort) {
  
   if (inString != null) {
     inString = trim(inString);
-    // convert to an int and map to the screen height:
-    // the format for the string is x: vvv | y: vvv | z: vvv
-    // where vvv is a three-digit integer representing the value
-    int xBeg = "x: ".length();
-    int xEnd = "x: vvv".length();
+   
     float xIn = float(inString.substring(xBeg, xEnd)); 
-    xIn = map(xIn, deg0, deg360, 0, graphHt/3);
-    xReading = xIn;
-    
-    int yBeg = "x: vvv | y: ".length();
-    int yEnd = "x: vvv | y: vvv".length();
+    x.newReading(xIn);
+
     float yIn = float(inString.substring(yBeg, yEnd)); 
-    yIn = map(yIn, deg0, deg360, 0, graphHt/3);
-    yReading = yIn;
-    
-    int zBeg = "x: vvv | y: vvv | z: ".length();
-    int zEnd = "x: vvv | y: vvv | z: vvv".length();
+    y.newReading(yIn);
+
     float zIn = float(inString.substring(zBeg, zEnd)); 
-    zIn = map(zIn, deg0, deg360, 0, graphHt/3);
-    zReading = zIn;
+    z.newReading(zIn);
     
     horzPos++;
+  }
+}
+
+class Axis {
+  int screenBoundLower, screenBoundUpper;
+  char label;
+  float lastReading;
+  float currentReading;
+  
+  float[] threshes = {0,0};
+  boolean[] crossedThreshes = {false, false};
+  
+  Range threshRange;
+ 
+  Axis(int screenBoundLower, int screenBoundUpper, char label) {
+    this.screenBoundLower = screenBoundLower;
+    this.screenBoundUpper = screenBoundUpper;
+    this.label = label;
+    
+    threshRange = cp5.addRange(label + "threshes")
+             // disable broadcasting since setRange and setRangeValues will trigger an event
+             .setBroadcast(false) 
+             .setPosition(graphWid, (screenBoundLower+screenBoundUpper)/2 - 20)
+             .setSize(deg360,40)
+             .setHandleSize(20)
+             .setRange(0,360)
+             .setRangeValues(50,100)
+             // after the initialization we turn broadcast back on again
+             .setBroadcast(true)
+             .setColorForeground(fg)
+             .setColorBackground(bg)  
+             ;
+  }
+  
+  void draw() {
+    stroke(base);
+    line(0, screenBoundUpper, width, screenBoundUpper);
+    stroke(firstThresh);
+    point(horzPos, threshes[LOW]);
+    stroke(secondThresh);
+    point(horzPos, threshes[HIGH]);
+    
+    if (crossedThreshes[LOW] || crossedThreshes[HIGH]) stroke(firstThresh);
+    else if (crossedThreshes[LOW] && crossedThreshes[HIGH]) stroke(secondThresh);
+    else stroke(base);
+    point(horzPos, currentReading);
+  }
+  
+  void newReading(float newReading) {
+    newReading = map(newReading, deg0, deg360, screenBoundLower, screenBoundUpper);
+    
+    lastReading = currentReading;
+    currentReading = newReading;
+    
+    /*if (crossedFromBelow(LOW) && !crossedThreshes[LOW]) {
+      crossedThreshes[LOW] = true; 
+    } else if (crossedFromAbove(LOW) && crossedThreshes[LOW]){
+      crossedThreshes[LOW] = false;
+    } else 
+    
+    if (!crossedThreshes[HIGH] && crossedFromBelow(LOW)) {
+      crossedThreshes[LOW] = true;
+    }
+    else if (crossedThreshes[HIGH] && crossedFromAbove(LOW)) {
+      crossedThreshes[LOW] = true;
+    }
+    else if (crossedFromBelow(HIGH) && ) {
+      crossedThreshes[HIGH] = true;
+    }*/
+    // TODO : please implement this state machine!!!!! I am too tired to do it now.
+  }
+  
+  boolean crossedFromBelow(int THRESH) {
+    return lastReading < threshes[THRESH] && currentReading > threshes[THRESH];
+  }
+  
+  boolean crossedFromAbove(int THRESH) {
+    return lastReading > threshes[THRESH] && currentReading < threshes[THRESH];
+  }
+  
+  void newThreshes(float lowThresh, float highThresh) {
+    threshes[LOW] = map(lowThresh, 0, 360, screenBoundLower, screenBoundUpper);
+    threshes[HIGH] = map(highThresh, 0, 360, screenBoundLower, screenBoundUpper);
   }
 }
