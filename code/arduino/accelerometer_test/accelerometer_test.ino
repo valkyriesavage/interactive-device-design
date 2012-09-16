@@ -4,17 +4,17 @@
   *
   *  borrowed from http://bildr.org/2011/04/sensing-orientation-with-the-adxl335-arduino/
   */
-  
+
 //Analog read pins
-const int xPin = 0;
-const int yPin = 1;
-const int zPin = 2;
+const int xPin = 1;
+const int yPin = 2;
+const int zPin = 3;
 
 //The minimum and maximum values that came from
 //the accelerometer while standing still
 //You very well may need to change these
-int minVal = 265;
-int maxVal = 402;
+int minVal = 334;
+int maxVal = 408;
 
 //to hold the caculated values
 double x;
@@ -46,11 +46,20 @@ void loop(){
 
   //Output the caculations
   Serial.print("x: ");
-  Serial.print(x);
+  printDigits(x);
   Serial.print(" | y: ");
-  Serial.print(y);
+  printDigits(y);
   Serial.print(" | z: ");
-  Serial.println(z);
+  printDigits(z);
+  Serial.println();
 
   delay(100);//just here to slow down the serial output - Easier to read
+}
+
+void printDigits(int digit) {
+  if(digit < 100) {
+    Serial.print("0");
+  } if (digit < 10) {
+    Serial.print("0");
+  } Serial.print(digit); 
 }

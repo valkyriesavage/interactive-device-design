@@ -41,8 +41,16 @@ int graphHt = 600;
 Axis x, y, z;
  
 void setup () {
-  size(graphWid + deg360, graphHt);        
- 
+  size(graphWid + deg360 + 50, graphHt);        
+
+  
+  // set up the nonsense for thresholding
+  cp5 = new ControlP5(this);
+
+  x = new Axis(0, graphHt/3, 'x');
+  y = new Axis(graphHt/3, 2*graphHt/3, 'y');
+  z = new Axis(2*graphHt/3, graphHt, 'z');
+
   // List all the available serial ports
   println(Serial.list());
   // I know that the first port in the serial list on my mac
@@ -53,13 +61,6 @@ void setup () {
   myPort.bufferUntil('\n');
   // set inital background:
   background(0);
-  
-  // set up the nonsense for thresholding
-  cp5 = new ControlP5(this);
-
-  x = new Axis(0, graphHt/3, 'x');
-  y = new Axis(graphHt/3, 2*graphHt/3, 'y');
-  z = new Axis(2*graphHt/3, graphHt, 'z');
 
   // prepare for pretty data!
   cleanSlate();
@@ -77,7 +78,6 @@ void draw () {
     horzPos = 1;
     cleanSlate();
   }
-  horzPos++;
   
   x.draw();
   y.draw();
@@ -109,8 +109,8 @@ int zEnd = "x: vvv | y: vvv | z: vvv".length();
 void serialEvent (Serial myPort) {
   // get the ASCII string:
   String inString = myPort.readStringUntil('\n');
- 
-  if (inString != null) {
+  
+  if (inString != null && inString.length() == zEnd + 2) {
     inString = trim(inString);
    
     float xIn = float(inString.substring(xBeg, xEnd)); 
@@ -147,12 +147,14 @@ class Axis {
     
     threshRange = cp5.addRange(this.label)
                      .setPosition(graphWid, (screenBoundLower+screenBoundUpper)/2 - 20)
+                     .setBroadcast(false)
                      .setSize(deg360,40)
                      .setHandleSize(20)
                      .setRange(deg0,deg360)
                      .setRangeValues(defaultLow,defaultHigh)
                      .setColorForeground(fg)
-                     .setColorBackground(bg)  
+                     .setColorBackground(bg)
+                     .setBroadcast(true)
                      ;
     threshes[LOW] = defaultLow;
     threshes[HIGH] = defaultHigh;
@@ -166,17 +168,26 @@ class Axis {
     stroke(secondThresh);
     point(horzPos, map(threshes[HIGH], deg0, deg360, screenBoundLower+1, screenBoundUpper-1));
     
-    if (crossedThresh(LOW)) stroke(firstThresh);
-    else if (on) stroke(secondThresh);
-    else stroke(base);
-    point(horzPos, map(currentReading, deg0, deg360, screenBoundLower, screenBoundUpper));
+    if (on) stroke(secondThresh);
+    else if (currentReading > threshes[LOW]) stroke(firstThresh);
+    else stroke(data);
+    if (horzPos > 0) {
+      line(horzPos - 1, map(lastReading, deg0, deg360, screenBoundLower, screenBoundUpper),
+           horzPos, map(currentReading, deg0, deg360, screenBoundLower, screenBoundUpper));
+    } else {
+      point(horzPos, map(currentReading, deg0, deg360, screenBoundLower, screenBoundUpper));
+    }
   }
   
   void newReading(float newReading) {    
     lastReading = currentReading;
     currentReading = newReading;
     
-    if (crossedFromAbove(LOW)) {
+    updateOn();
+  }
+  
+  void updateOn() {
+   if (crossedFromAbove(LOW)) {
       on = false;
     } else if (crossedFromBelow(HIGH)) {
       on = true;
@@ -198,6 +209,7 @@ class Axis {
   void newThreshes(float lowThresh, float highThresh) {
     threshes[LOW] = lowThresh;
     threshes[HIGH] = highThresh;
+    updateOn();
   }
   
   String label() { return label; }

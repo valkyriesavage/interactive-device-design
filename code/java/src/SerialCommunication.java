@@ -22,7 +22,7 @@ public class SerialCommunication implements SerialPortEventListener {
       "/dev/tty.usbmodemfa131", // Mac, Arduino Uno
       "/dev/tty.usbmodemfa121", // Mac, Arduino Uno
       "/dev/tty.usbmodem12341", // Mac, Teensy
-      "/dev/tty.", // Mac, Boarduino
+      "/dev/tty.usbserial-FTFOM7O3", // Mac, Boarduino
       "/dev/ttyACM0", // Linux, Arduino Uno
       "COM3", // Windows
   };
