@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<!-- saved from url=(0043)http://www.wolfenstein.com/game/wolf3d.html -->
+<html lang="en-US" class=" js no-flexbox canvas canvastext webgl no-touch postmessage websqldatabase indexeddb hashchange history draganddrop websockets rgba hsla multiplebgs borderimage borderradius boxshadow textshadow opacity cssanimations csscolumns cssgradients cssreflections csstransforms csstransforms3d csstransitions generatedcontent video audio localstorage sessionstorage webworkers applicationcache fullscreen no-gamepad"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<meta charset="UTF-8">
+    <meta http-equiv="pragma" content="no-cache">
+    <meta http-equiv="cache-control" content="max-age=0">
+    <meta http-equiv="cache-control" content="no-cache">
+    <meta http-equiv="cache-control" content="no-store">
+    <meta name="viewport" content="width=640, height=400, user-scalable=no">
+    <link rel="shortcut icon" href="http://www.wolfenstein.com/game/favicon.png">
+	<title>Wolfenstein 3D</title>
+    <link rel="stylesheet" href="http://zmi-cdnstatic.s3.amazonaws.com/wolfenstein.bethsoft.com/styles.css">
+
+    <script src="./Wolfenstein 3D_files/requestAnimFrame.js"></script><script src="./Wolfenstein 3D_files/wolf.js"></script><script src="./Wolfenstein 3D_files/random.js"></script><script src="./Wolfenstein 3D_files/angle.js"></script><script src="./Wolfenstein 3D_files/math.js"></script><script src="./Wolfenstein 3D_files/input.js"></script><script src="./Wolfenstein 3D_files/sound.js"></script><script src="./Wolfenstein 3D_files/menu.js"></script><script src="./Wolfenstein 3D_files/file.js"></script><script src="./Wolfenstein 3D_files/episodes.js"></script><script src="./Wolfenstein 3D_files/maps.js"></script><script src="./Wolfenstein 3D_files/game.js"></script><script src="./Wolfenstein 3D_files/player.js"></script><script src="./Wolfenstein 3D_files/sprites.js"></script><script src="./Wolfenstein 3D_files/powerups.js"></script><script src="./Wolfenstein 3D_files/ai.js"></script><script src="./Wolfenstein 3D_files/actorai.js"></script><script src="./Wolfenstein 3D_files/actors.js"></script><script src="./Wolfenstein 3D_files/actstat.js"></script><script src="./Wolfenstein 3D_files/weapon.js"></script><script src="./Wolfenstein 3D_files/doors.js"></script><script src="./Wolfenstein 3D_files/pushwall.js"></script><script src="./Wolfenstein 3D_files/areas.js"></script><script src="./Wolfenstein 3D_files/level.js"></script><script src="./Wolfenstein 3D_files/raycaster.js"></script><script src="./Wolfenstein 3D_files/renderer.js"></script><script src="./Wolfenstein 3D_files/modernizr.custom.js"></script>
+    <script src="./Wolfenstein 3D_files/jquery-1.7.1.min.js"></script>
+    <script src="./Wolfenstein 3D_files/load.js"></script>
+
+</head>
+<body>
+
+<div id="main">
+    <div id="title-screen" style="display: none; "></div>
+    
+    <div id="menu" class="main" style="display: block; ">
+        <div class="message confirm-newgame">
+            <div class="box"></div>
+        </div>
+
+        <div class="menu main active" style="display: block; ">
+            <ul class="selector">
+                <li data-submenu="episodes" class="newgame"><div class="button"></div></li>
+                <li data-submenu="sound" class="sound"><div class="button"></div></li>
+                <li data-submenu="control" class="control"><div class="button"></div></li>
+                <li class="readthis active"><div class="button"></div></li>
+                <li class="resumegame hidden" style="display: none; "><div class="button"></div></li>
+            </ul>
+        </div>
+        
+        <div class="menu sound" data-backmenu="main" style="display: none; ">
+            <ul class="selector">
+                <li class="sfxon"><div class="button"><div class="light"></div></div></li>
+                <li class="sfxoff"><div class="button"><div class="light"></div></div></li>
+                <li class="musicon"><div class="button"><div class="light"></div></div></li>
+                <li class="musicoff"><div class="button"><div class="light"></div></div></li>
+            </ul>
+        </div>
+        
+        <div class="menu control" data-backmenu="main" style="display: none; ">
+            <ul class="selector">
+                <li class="mouseenabled"><div class="button"><div class="light"></div></div></li>
+                <li data-submenu="customize" class="customize"><div class="button"></div></li>
+            </ul>
+        </div>
+        
+        <div class="menu customize" data-backmenu="control" style="display: none; ">
+            <ul class="selector">
+                <li class="customizekeys line1"><div class="button">
+                    <span class="k1 run" data-action="run"></span>
+                    <span class="k2 use" data-action="use"></span>
+                    <span class="k3 attack" data-action="attack"></span>
+                    <span class="k4 strafe" data-action="strafe"></span>
+                </div></li>
+                <li class="customizekeys line1"><div class="button">
+                    <span class="k1 left" data-action="left"></span>
+                    <span class="k2 right" data-action="right"></span>
+                    <span class="k3 up" data-action="up"></span>
+                    <span class="k4 down" data-action="down"></span>
+                </div></li>
+            </ul>
+        </div>
+        
+        <div class="menu skill" data-backmenu="episodes" style="display: none; ">
+            <div class="face"></div>
+            <ul class="selector">
+                <li data-submenu="levels" data-skill="gd_baby" class="baby"><div class="button"></div></li>
+                <li data-submenu="levels" data-skill="gd_easy" class="easy"><div class="button"></div></li>
+                <li data-submenu="levels" data-skill="gd_medium" class="medium"><div class="button"></div></li>
+                <li data-submenu="levels" data-skill="gd_hard" class="hard"><div class="button"></div></li>
+            </ul>
+        </div>
+        
+        <div class="menu episodes" data-backmenu="main" style="display: none; ">
+            <ul>
+                <li data-episode="0" class="episode-0"><div class="button"></div></li>
+                <li data-episode="1" class="episode-1"><div class="button"></div></li>
+                <li data-episode="2" class="episode-2"><div class="button"></div></li>
+            </ul>
+        </div>
+
+        <div class="menu levels" data-backmenu="skill" style="display: none; ">
+            <ul class="two-column selector">
+                <li data-level="0" class="level-0"><div class="button"></div></li>
+                <li data-level="1" class="level-1"><div class="button"></div></li>
+                <li data-level="2" class="level-2"><div class="button"></div></li>
+                <li data-level="3" class="level-3"><div class="button"></div></li>
+                <li data-level="4" class="level-4"><div class="button"></div></li>
+            </ul>
+            <ul class="two-column selector">
+                <li data-level="5" class="level-5"><div class="button"></div></li>
+                <li data-level="6" class="level-6"><div class="button"></div></li>
+                <li data-level="7" class="level-7"><div class="button"></div></li>
+                <li data-level="8" class="level-8"><div class="button"></div></li>
+                <li data-level="9" class="level-9"><div class="button"></div></li>
+            </ul>
+        </div>
+            
+    </div>
+    
+    <div id="text-screen"></div>
+    
+ 
+    <div id="game">
+        <div class="fps"></div>
+        
+        <div class="renderer">
+            <div class="ceiling"></div>
+            <div class="floor"></div>
+            <div class="player-weapon"></div>
+            <div class="damage-flash overlay"></div>
+            <div class="bonus-flash overlay"></div>
+            <div class="death overlay"></div>
+            <div class="pause overlay"><img alt="" src="./Wolfenstein 3D_files/paused.png"></div>
+        </div>
+        
+        <div class="loading"><img alt="" src="./Wolfenstein 3D_files/getpsyched.png"></div>
+        
+        <div class="gameover"></div>
+        
+        <div class="intermission">
+            <div class="background"></div>
+            <div class="background-secret"></div>
+            <div class="background-victory"></div>
+            
+            <div class="bj"></div>
+            
+            <div class="floor stat">
+                <div class="digit"></div>
+                <div class="digit"></div>
+            </div>
+            
+            <div class="bonus stat">
+                <div class="digit"></div>
+                <div class="digit"></div>
+                <div class="digit"></div>
+                <div class="digit"></div>
+                <div class="digit"></div>
+                <div class="digit"></div>
+            </div>
+            
+            <div class="total-time-minutes victory-stat">
+                <div class="digit"></div><div class="digit"></div>
+            </div>
+            <div class="total-time-seconds victory-stat">
+                <div class="digit"></div><div class="digit"></div>
+            </div>
+
+            <div class="time-minutes stat">
+                <div class="digit"></div>
+                <div class="digit"></div>
+            </div>
+            <div class="time-seconds stat">
+                <div class="digit"></div>
+                <div class="digit"></div>
+            </div>
+            <div class="par-minutes stat">
+                <div class="digit"></div>
+                <div class="digit"></div>
+            </div>
+            <div class="par-seconds stat">
+                <div class="digit"></div>
+                <div class="digit"></div>
+            </div>
+
+            <div class="kill-ratio stat">
+                <div class="digit"></div>
+                <div class="digit"></div>
+                <div class="digit"></div>
+            </div>
+            <div class="secret-ratio stat">
+                <div class="digit"></div>
+                <div class="digit"></div>
+                <div class="digit"></div>
+            </div>
+            <div class="treasure-ratio stat">
+                <div class="digit"></div>
+                <div class="digit"></div>
+                <div class="digit"></div>
+            </div>
+            
+            <div class="avg-kill-ratio victory-stat">
+                <div class="digit"></div><div class="digit"></div><div class="digit"></div>
+            </div>
+            <div class="avg-secret-ratio victory-stat">
+                <div class="digit"></div><div class="digit"></div><div class="digit"></div>
+            </div>
+            <div class="avg-treasure-ratio victory-stat">
+                <div class="digit"></div><div class="digit"></div><div class="digit"></div>
+            </div>
+        </div>
+       
+        
+        <div class="hud">
+            <div class="floor number-container">
+                <div class="number"></div>
+            </div>
+            <div class="score number-container">
+                <div class="number"></div><div class="number"></div><div class="number"></div><div class="number"></div><div class="number"></div><div class="number"></div>
+            </div>
+            <div class="lives number-container">
+                <div class="number"></div>
+            </div>
+            <div class="health number-container">
+                <div class="number"></div><div class="number"></div><div class="number"></div>
+            </div>
+            <div class="ammo number-container">
+                <div class="number"></div><div class="number"></div>
+            </div>
+            <div class="key1"></div>
+            <div class="key2"></div>
+            <div class="bj"></div>
+            <div class="weapon"></div>
+        </div>
+    </div>
+</div>
+
+
+<div id="directions_extension" style="display: none; "></div></body></html>

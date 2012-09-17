@@ -3,9 +3,6 @@ import gnu.io.SerialPort;
 import gnu.io.SerialPortEvent;
 import gnu.io.SerialPortEventListener;
 
-import java.awt.AWTException;
-import java.awt.Robot;
-import java.awt.event.KeyEvent;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -15,17 +12,9 @@ import java.util.Enumeration;
  * This code was inspired by the Internet and stolen from the Midas code.
  */
 
-public class SerialCommunication implements SerialPortEventListener {
+public abstract class SerialCommunication implements SerialPortEventListener {
   SerialPort serialPort;
 
-  private static final String PORT_NAMES[] = { 
-      "/dev/tty.usbmodemfa131", // Mac, Arduino Uno
-      "/dev/tty.usbmodemfa121", // Mac, Arduino Uno
-      "/dev/tty.usbmodem12341", // Mac, Teensy
-      "/dev/tty.usbserial-FTFOM7O3", // Mac, Boarduino
-      "/dev/ttyACM0", // Linux, Arduino Uno
-      "COM3", // Windows
-  };
   /** Buffered input stream from the port */
   private InputStream input;
   /** The output stream to the port */
@@ -35,14 +24,10 @@ public class SerialCommunication implements SerialPortEventListener {
   /** Default bits per second for COM port. */
   private static final int DATA_RATE = 9600;
 
-  private String currentSerialInfo = new String();
+  protected String currentSerialInfo = new String();
   
-  private Robot robot;
 
-  public void initialize() throws AWTException {
-    // random stuff setup
-    robot = new Robot();
-    robot.setAutoDelay(200);
+  public void initialize(String portName) {
 
     CommPortIdentifier portId = null;
     // the following line is useful for computers with AMD processors. it's
@@ -56,11 +41,9 @@ public class SerialCommunication implements SerialPortEventListener {
     while (portEnum.hasMoreElements()) {
       CommPortIdentifier currPortId = (CommPortIdentifier) portEnum
           .nextElement();
-      for (String portName : PORT_NAMES) {
-        if (currPortId.getName().equals(portName)) {
-          portId = currPortId;
-          break;
-        }
+      if (currPortId.getName().equals(portName)) {
+        portId = currPortId;
+        break;
       }
     }
 
@@ -111,7 +94,7 @@ public class SerialCommunication implements SerialPortEventListener {
   }
 
   /**
-   * Handle an event on the serial port. Read the data and print it.
+   * Handle an event on the serial port. Read the data and act on it.
    */
   public synchronized void serialEvent(SerialPortEvent oEvent) {
     if (oEvent.getEventType() == SerialPortEvent.DATA_AVAILABLE) {
@@ -127,72 +110,10 @@ public class SerialCommunication implements SerialPortEventListener {
 
       currentSerialInfo = (currentSerialInfo + new String(actions));
     }
-  }
-  
-  /**
-   * Figure out what to do now that we have a bunch of dataz
-   */
-  private void actOnData() {
-    switch(currentSerialInfo.charAt(0)) {
-      case 'L':
-        turnLeft();
-        break;
-      case 'R':
-        turnRight();
-        break;
-      case 'F':
-        moveForward();
-        break;
-      case 'B':
-        moveBackward();
-        break;
-      case '!':
-        fire();
-        break;
-      default:
-        System.out.println("What???");  
-    }
     
-    currentSerialInfo = currentSerialInfo.substring(1);
+    actOnData();
   }
   
-  /**
-   * Fire!
-   */
-  private void fire() {
-    robot.keyPress(KeyEvent.VK_X);
-    robot.keyRelease(KeyEvent.VK_X);
-  }
-  
-  /**
-   * Turn left
-   */
-  private void turnLeft() {
-    robot.keyPress(KeyEvent.VK_LEFT);
-    robot.keyRelease(KeyEvent.VK_LEFT);
-  }
-  
-  /**
-   * Turn right
-   */
-  private void turnRight() {
-    robot.keyPress(KeyEvent.VK_RIGHT);
-    robot.keyRelease(KeyEvent.VK_RIGHT);
-  }
-  
-  /**
-   * Move forward
-   */
-  private void moveForward() {
-    robot.keyPress(KeyEvent.VK_UP);
-    robot.keyRelease(KeyEvent.VK_UP);
-  }
-  
-  /**
-   * Move backward
-   */
-  private void moveBackward() {
-    robot.keyPress(KeyEvent.VK_DOWN);
-    robot.keyRelease(KeyEvent.VK_DOWN);
-  }
+  public abstract void actOnData();
+
 }
