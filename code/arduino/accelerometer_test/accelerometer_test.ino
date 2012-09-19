@@ -13,8 +13,8 @@ const int zPin = 3;
 //The minimum and maximum values that came from
 //the accelerometer while standing still
 //You very well may need to change these
-int minVal = 334;
-int maxVal = 408;
+int minVal = 301;
+int maxVal = 404;
 
 //to hold the caculated values
 double x;

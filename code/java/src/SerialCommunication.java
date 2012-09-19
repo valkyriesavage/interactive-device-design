@@ -110,8 +110,7 @@ public abstract class SerialCommunication implements SerialPortEventListener {
 
       currentSerialInfo = (currentSerialInfo + new String(actions));
     }
-    
-    actOnData();
+      actOnData();
   }
   
   public abstract void actOnData();

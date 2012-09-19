@@ -5,28 +5,17 @@ public class DoIt {
 
   public static void main(String[] args) throws Exception {
     SerialCarder scoreKeeper = new SerialCarder();
-    scoreKeeper.initialize("/dev/tty.usbserial-FTFOM7O3");
+    scoreKeeper.initialize("/dev/tty.usbserial-FTFOKU5L"); 
     
     SerialController gameGun = new SerialController();
-    gameGun.initialize("/dev/tty.usbserial-FTFOM7O3");
+    gameGun.initialize("/dev/tty.usbserial-FTFOM7O3"); 
     
     Server server = new Server(8888);
     ScoreHandler handler = new ScoreHandler();
+    handler.setDestination(scoreKeeper);
     server.setHandler(handler);
-
+    
     server.start();
     server.join();
-    
-    int highScore = 0;
-    
-    while (true /* card is not tapped */) {
-      // wait for card to tap
-      if (false /* first card tap */) {
-        // read highScore from tap
-      }
-      if (handler.score > 0) {
-        // write greater of (score, highScore) to card
-      }
-    }
   }
 }
