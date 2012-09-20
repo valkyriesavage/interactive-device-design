@@ -1,6 +1,7 @@
 import org.eclipse.jetty.server.Server;
 
 
+
 public class DoIt {
 
   public static void main(String[] args) throws Exception {
@@ -17,5 +18,11 @@ public class DoIt {
     
     server.start();
     server.join();
+    /*JFrame frame = new JFrame();
+    frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+    frame.setSize(300,300);
+    JButton button = new JButton("Ok, I'm done");
+    frame.getContentPane().add(button);
+    frame.setVisible(true);*/
   }
 }

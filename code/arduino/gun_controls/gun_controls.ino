@@ -18,19 +18,22 @@ const int ledPin = 13; // for debugging
 //The minimum and maximum values that came from
 //the accelerometer while standing still
 //You very well may need to change these
-int minVal = 301;
-int maxVal = 401;
+int minVal = 207;
+int maxVal = 326;
 
 //to hold the caculated values
 double x;
 double y;
 double z;
 
+//directions
+boolean fromAbove = true;
+
 //Events to trigger
-Event up('B', 290, 308);
-Event down('F', 37, 55);
-Event left('L', 111, 160);
-Event right('R', 293, 318);
+Event up('B', 40, 49, fromAbove);
+Event down('F', 56, 75, !fromAbove);
+Event left('L', 7, 20, fromAbove);
+Event right('R', 27, 42, !fromAbove);
 
 // Variables will change:
 int lastButtonState = HIGH;   // the previous reading from the input pin
@@ -71,8 +74,8 @@ void loop(){
   y = RAD_TO_DEG * (atan2(-xAng, -zAng) + PI);
   z = RAD_TO_DEG * (atan2(-yAng, -xAng) + PI);
 
-  up.evaluate(y);
-  down.evaluate(y);
+  up.evaluate(z);
+  down.evaluate(z);
   left.evaluate(x);
   right.evaluate(x);
   
@@ -114,7 +117,5 @@ void loop(){
   // it'll be the lastButtonState:
   lastButtonState = reading;
   /******************************************************/
-
-  delay(100);//just here to slow down the serial output - Easier to read
 }
 

@@ -11,7 +11,7 @@
 class Event
 {
   public:
-    Event(char label, double lowThresh, double highThresh);
+    Event(char label, double lowThresh, double highThresh, boolean fromAbove);
     void evaluate(double currentReading);
     char serialOut();
   private:
@@ -20,7 +20,9 @@ class Event
     double _prevReading;
     double _lowThresh;
     double _highThresh;
+    boolean _fromAbove;
     boolean _on;
+    long _lastPrintTime;
 };
 
 #endif

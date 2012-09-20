@@ -15,17 +15,14 @@ public class SerialController extends SerialCommunication {
     } catch (AWTException e) {
       e.printStackTrace();
     }
-    robot.setAutoDelay(200);
+    //robot.setAutoDelay(200);
   }
   
   /**
    * Figure out what to do now that we have a bunch of dataz
    */
   public void actOnData() {
-    // make sure we have the window selected
-    robot.mouseMove(500, 500);
-    robot.mousePress(MouseEvent.BUTTON1);
-    robot.mouseRelease(MouseEvent.BUTTON1);
+    currentSerialInfo.replaceAll("[^LRFB!]", "");
     
     switch(currentSerialInfo.charAt(0)) {
       case 'L':
@@ -44,7 +41,7 @@ public class SerialController extends SerialCommunication {
         fire();
         break;
       default:
-        System.out.println("What???");  
+        break;  
     }
     
     currentSerialInfo = currentSerialInfo.substring(1);

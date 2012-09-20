@@ -41,9 +41,7 @@ public class SerialCarder extends SerialCommunication {
 	  } else {
 		  lastScore = Integer.parseInt(inData);
 	  }
-	  if (lastScore > highScore) {
-		  highScore = lastScore;
-	  }
+	  setHighScore(lastScore);
 
 	  currentSerialInfo = "";
   }
