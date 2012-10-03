@@ -1,0 +1,17 @@
+<!-- run with app-02-socket.js and app-03-both.js-->
+<html>
+<head>
+	<script src="/socket.io/socket.io.js"></script>
+	<script>
+	  var socket = io.connect('http://localhost');
+		socket.on('a2d', function(data) {
+			document.getElementById("a0").innerText = data["a0"];
+			document.getElementById("a1").innerText = data["a1"];
+		});
+	</script>
+</head>
+<body><h1>Browser Push Demo</h1>
+	Analog input A0: <div id="a0"></div><br>
+	Analog input A1: <div id="a1"></div><br>
+</body>
+</html>
