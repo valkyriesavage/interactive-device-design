@@ -1,0 +1,19 @@
+<html>
+  <head>
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+      var socket = io.connect('http://localhost');
+      socket.on('a2d', function(data) {
+        document.getElementById("a0").innerText = 100/data["a0"];
+      });
+      function waterIt() {
+        socket.emit('water', {whatToDo: "water!"});
+      }
+    </script>
+  </head>
+  <body><h1>Water state of plant</h1>
+    Wetness: <div id="a0"></div><br/>
+    <br/>
+    <a href="#" onclick="waterIt()">WATER IT</a>
+  </body>
+</html>
